@@ -516,7 +516,7 @@ function excelToISO(v){
 async function sheetsGET(params){
   const url=getURL();
   if(!url)throw new Error('URL não configurada. Vá em Configurações.');
-  const qs=Object.entries(params).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(v)).join('&');
+  const qs=Object.entries(params).map(([k,v])=>encodeURIComponent(k)+'='+encodeURIComponent(typeof v==='object'?JSON.stringify(v):v)).join('&');
   const ctrl=new AbortController();
   const timer=setTimeout(()=>ctrl.abort(),30000);
   try{
@@ -528,24 +528,11 @@ async function sheetsGET(params){
 }
 
 async function sheetsPOST(body){
-  const url=getURL();
-  if(!url)throw new Error('URL não configurada.');
-  const ctrl=new AbortController();
-  const timer=setTimeout(()=>ctrl.abort(),60000);
-  try{
-    const r=await fetch(url,{
-      method:'POST',
-      body:JSON.stringify(body),
-      headers:{'Content-Type':'text/plain'}
-    });
-    const d=await r.json();
-    if(!d.ok)throw new Error(d.error||'Erro desconhecido');
-    return d.data;
-  }finally{clearTimeout(timer)}
+  return sheetsGET(body);
 }
 
 async function sheetsBatch(sheet,rows){
-  return sheetsPOST({action:'appendBatch',sheet,rows});
+  return sheetsGET({action:'appendBatch',sheet,rows:JSON.stringify(rows)});
 }
 
 function setConn(st){
