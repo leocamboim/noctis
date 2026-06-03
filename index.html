@@ -308,6 +308,7 @@ input[type=number]{-moz-appearance:textfield}
     <select id="pf-st" style="height:30px;font-size:12px" onchange="renderPedidos()"><option value="">Todos status</option><option>Pendente</option><option>Concluído</option></select>
     <select id="pf-mes" style="height:30px;font-size:12px" onchange="renderPedidos()"><option value="">Todos meses</option><option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option><option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option><option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option><option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option></select>
     <select id="pf-src" style="height:30px;font-size:12px" onchange="renderPedidos()"><option value="">Todas origens</option><option value="sheets">Sheets</option><option value="local">Local</option></select>
+    <select id="pf-ord" style="height:30px;font-size:12px" onchange="renderPedidos()"><option value="recente">Mais recente</option><option value="antigo">Mais antigo</option><option value="maior">Maior valor</option><option value="menor">Menor valor</option></select>
   </div>
   <div id="ped-nav"></div>
   <div class="tw"><table class="tbl"><thead><tr><th>#</th><th>Origem</th><th>Cliente</th><th>Data</th><th>Status</th><th>Kg</th><th>Total R$</th><th>Pago R$</th><th>Saldo R$</th><th style="text-align:right">Ações</th></tr></thead><tbody id="ped-tb"></tbody></table></div>
@@ -547,7 +548,8 @@ async function supa(method, table, body=null, params=''){
       'apikey': SUPA_KEY,
       'Authorization': 'Bearer ' + SUPA_KEY,
       'Content-Type': 'application/json',
-      'Prefer': method==='POST'?'return=representation':'return=representation'
+      'Prefer': 'return=representation',
+      'Range-Unit': 'items'
     }
   };
   if(body) opts.body = JSON.stringify(body);
@@ -606,7 +608,7 @@ async function sincronizar(){
       return all;
     }
     const [peds, itens, cores, artigos, forns] = await Promise.all([
-      fetchAll('pedidos','order=id.asc'),
+      fetchAll('pedidos','order=id.desc'),
       fetchAll('itens_pedido','order=id.asc'),
       supaGet('cores','order=nome.asc'),
       supaGet('artigos','order=nome.asc'),
@@ -768,7 +770,12 @@ function renderPedidos(resetPage){
   const sf=document.getElementById('pf-st')?.value||'';
   const mf=document.getElementById('pf-mes')?.value;
   const srcf=document.getElementById('pf-src')?.value||'';
-  let list=[...DB.pedidos].reverse();
+  const ord=document.getElementById('pf-ord')?.value||'recente';
+  let list=[...DB.pedidos];
+  if(ord==='recente') list=list.reverse();
+  else if(ord==='antigo') {} // já está em ordem crescente
+  else if(ord==='maior') list.sort((a,b)=>(parseFloat(b.total)||0)-(parseFloat(a.total)||0));
+  else if(ord==='menor') list.sort((a,b)=>(parseFloat(a.total)||0)-(parseFloat(b.total)||0));
   if(q)list=list.filter(p=>(p.cliente||'').toLowerCase().includes(q)||String(p.id).includes(q));
   if(sf)list=list.filter(p=>p.status===sf);
   if(mf!==''&&mf!==undefined)list=list.filter(p=>pMes(p)===parseInt(mf));
