@@ -593,10 +593,21 @@ async function sincronizar(){
   const el=document.getElementById('sync-status');
   if(el)el.innerHTML='<span class="spin"></span> Sincronizando com Supabase...';
   try{
-    // Buscar pedidos e itens em paralelo
+    // Buscar todos os registros paginando (Supabase max 1000 por vez)
+    async function fetchAll(table, params=''){
+      const all=[];let from=0;const size=1000;
+      while(true){
+        const chunk=await supaGet(table,(params?params+'&':'')+'limit='+size+'&offset='+from);
+        if(!chunk||!chunk.length)break;
+        all.push(...chunk);
+        if(chunk.length<size)break;
+        from+=size;
+      }
+      return all;
+    }
     const [peds, itens, cores, artigos, forns] = await Promise.all([
-      supaGet('pedidos','order=id.asc&limit=5000'),
-      supaGet('itens_pedido','order=id.asc&limit=50000'),
+      fetchAll('pedidos','order=id.asc'),
+      fetchAll('itens_pedido','order=id.asc'),
       supaGet('cores','order=nome.asc'),
       supaGet('artigos','order=nome.asc'),
       supaGet('fornecedores','order=nome.asc')
