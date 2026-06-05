@@ -23,14 +23,14 @@
   --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04)
 }
 body.dark{
-  --bg:#1a1917;--bg2:#222120;--bg3:#2a2927;
-  --bd:#333230;--bd2:#444240;
-  --tx:#f0ede8;--tx2:#a09d96;--tx3:#6b6860;
+  --bg:#1a2232;--bg2:#212d42;--bg3:#273244;
+  --bd:#2e3f58;--bd2:#3d5270;
+  --tx:#e8edf5;--tx2:#8fa3c0;--tx3:#5c7899;
   --green:#7ec85a;--green-bg:#1a2e10;
   --amber:#f4a622;--amber-bg:#2e1e05;
   --red:#f07070;--red-bg:#2e1010;
   --blue:#6bb3f5;--blue-bg:#0d1e33;
-  --shadow:0 1px 3px rgba(0,0,0,.3)
+  --shadow:0 1px 3px rgba(0,0,0,.4)
 }
 body,*{transition:background-color .2s,border-color .2s,color .15s}
 body{font-family:'DM Sans',sans-serif;color:var(--tx);background:var(--bg2);font-size:14px;line-height:1.5}
@@ -270,7 +270,7 @@ input[type=number]{-moz-appearance:textfield}
       <select id="sel-mes" style="width:130px;height:28px;font-size:12px" onchange="renderResumo()">
         <option value="all">Todo o período</option>
         <option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option>
-        <option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option>
+        <option value="3">Abril</option><option value="4">Maio</option><option value="5" selected>Junho</option>
         <option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option>
         <option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option>
       </select>
@@ -280,7 +280,7 @@ input[type=number]{-moz-appearance:textfield}
   <div class="mg" id="res-mg"></div>
   <div class="two">
     <div class="card"><h3><i class="ti ti-chart-line"></i>Faturamento mensal (R$)</h3><div style="position:relative;height:190px"><canvas id="ch-fat" role="img" aria-label="Faturamento mensal"></canvas></div></div>
-    <div class="card"><h3><i class="ti ti-weight"></i>Quilos por mês</h3><div style="position:relative;height:190px"><canvas id="ch-kg" role="img" aria-label="Quilos por mês"></canvas></div></div>
+    <div class="card"><h3><i class="ti ti-weight"></i><span id="kg-chart-title">Toneladas por mês</span></h3><div style="position:relative;height:190px"><canvas id="ch-kg" role="img" aria-label="Quilos por mês"></canvas></div></div>
   </div>
   <div class="two">
     <div class="card"><h3><i class="ti ti-users"></i>Top clientes (R$)</h3><div id="top-cli"></div></div>
@@ -306,7 +306,7 @@ input[type=number]{-moz-appearance:textfield}
   <div class="sr">
     <input type="text" id="ps" placeholder="Buscar cliente ou #ID..." oninput="renderPedidos()">
     <select id="pf-st" style="height:30px;font-size:12px" onchange="renderPedidos()"><option value="">Todos status</option><option>Pendente</option><option>Concluído</option></select>
-    <select id="pf-mes" style="height:30px;font-size:12px" onchange="renderPedidos()"><option value="">Todos meses</option><option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option><option value="3">Abril</option><option value="4">Maio</option><option value="5">Junho</option><option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option><option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option></select>
+    <select id="pf-mes" style="height:30px;font-size:12px" onchange="renderPedidos()"><option value="">Todos meses</option><option value="0">Janeiro</option><option value="1">Fevereiro</option><option value="2">Março</option><option value="3">Abril</option><option value="4">Maio</option><option value="5" selected>Junho</option><option value="6">Julho</option><option value="7">Agosto</option><option value="8">Setembro</option><option value="9">Outubro</option><option value="10">Novembro</option><option value="11">Dezembro</option></select>
     <select id="pf-src" style="height:30px;font-size:12px" onchange="renderPedidos()"><option value="">Todas origens</option><option value="sheets">Sheets</option><option value="local">Local</option></select>
     <select id="pf-ord" style="height:30px;font-size:12px" onchange="renderPedidos()"><option value="recente">Mais recente</option><option value="antigo">Mais antigo</option><option value="maior">Maior valor</option><option value="menor">Menor valor</option></select>
   </div>
@@ -338,7 +338,7 @@ input[type=number]{-moz-appearance:textfield}
     <h3><i class="ti ti-package"></i>Itens do pedido</h3>
     <table class="itbl"><thead><tr><th style="width:27%">Artigo</th><th style="width:21%">Cor</th><th style="width:13%">Fornecedor</th><th style="width:12%">Kg</th><th style="width:12%">Preço venda</th><th style="width:11%">Total</th><th style="width:4%"></th></tr></thead><tbody id="itb"></tbody></table>
     <div style="display:flex;gap:7px;margin-top:7px;flex-wrap:wrap">
-      <button class="btn ghost sm" onclick="addRow()"><i class="ti ti-plus"></i>Adicionar item</button>
+      <button class="btn ghost sm" onclick="addRow(getFirstRowData()?{...getFirstRowData(),kg:''}:null);calcTtl()"><i class="ti ti-plus"></i>Adicionar item</button>
       <button class="btn ghost sm" onclick="addMultiRows()" style="color:var(--acc)"><i class="ti ti-playlist-add"></i>+ 20 itens</button>
       <button class="btn ghost sm" onclick="addCustomRows()" style="color:var(--tx2)"><i class="ti ti-adjustments"></i>Qtd personalizada</button>
     </div>
@@ -407,6 +407,7 @@ input[type=number]{-moz-appearance:textfield}
     <div id="sync-status" style="font-size:13px;color:var(--tx2)">Não sincronizado ainda.</div>
     <div style="margin-top:10px">
       <button class="btn sm danger" onclick="if(confirm('Limpar todos os dados locais?')){clearLocal();showMsg('cfg-msg','Dados locais limpos.','ok')}"><i class="ti ti-trash"></i>Limpar dados locais</button>
+    </div></div
     </div>
   </div>
 </div>
@@ -455,6 +456,16 @@ input[type=number]{-moz-appearance:textfield}
       <div id="cor-msg"></div>
     </div>
     <div class="mf"><button class="btn" onclick="closeM('m-cor')">Cancelar</button><button class="btn prim" onclick="saveCor()">Salvar</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="m-cli" onclick="if(event.target===this)closeM('m-cli')">
+  <div class="modal" style="max-width:680px">
+    <div class="mh">
+      <h3><i class="ti ti-user" style="color:var(--acc)"></i><span id="cli-nome">Cliente</span></h3>
+      <button class="btn ghost sm" onclick="closeM('m-cli')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="mb" id="cli-body"></div>
   </div>
 </div>
 
@@ -726,19 +737,59 @@ function renderResumo(){
       ${descTotal>0.01?`<div style="font-size:11px;color:var(--tx3);margin-top:4px">-${fR(descTotal)} em descontos</div>`:''}
     </div>
     <div class="mc accent"><div class="ml">A receber</div><div class="mv">${fR(aReceber)}</div></div>
-    <div class="mc"><div class="ml">Quilos</div><div class="mv">${fKg(kg)}</div></div>
-    <div class="mc"><div class="ml">Pedidos</div><div class="mv">${ps.length}</div><div class="ms">${pend} pendentes</div></div>`;
+    <div class="mc">
+      <div class="ml">Volume</div>
+      <div class="mv">${kg>=1000?'<span style="font-size:28px;font-weight:800;letter-spacing:-1px">'+(kg/1000).toFixed(2)+'</span><span style="font-size:14px;color:var(--tx2);margin-left:4px">t</span>':fKg(kg)}</div>
+      ${kg>=1000?'<div style="font-size:11px;color:var(--tx3);margin-top:2px">'+fKg(kg)+'</div>':''}
+    </div>
+    <div class="mc"><div class="ml">Pedidos</div><div class="mv">${ps.length}</div><div class="ms">${pend} pendentes</div></div>
+    ${renderRecorde(DB.pedidos)}
+    ${renderRitmo(DB.pedidos)}`;
   const bm=Array(12).fill(0).map(()=>({f:0,k:0}));
   DB.pedidos.forEach(p=>{const m=pMes(p);if(m>=0){bm[m].f+=parseFloat(p.total)||0;bm[m].k+=parseFloat(p.kg)||0}});
   const mcd=bm.map((v,i)=>({...v,i})).filter(v=>v.f>0||v.k>0);
   const lbs=mcd.map(v=>MESES[v.i]);
-  dch('fat');dch('kg');
+  dch('fat');
   const chartOpts=(color,type)=>({type,data:{labels:lbs,datasets:[{label:'',data:mcd.map(v=>type==='bar'?Math.round(v.f):parseFloat(v.k.toFixed(1))),backgroundColor:type==='bar'?color:'transparent',borderColor:color,fill:type==='line',tension:.35,borderRadius:type==='bar'?4:0,pointRadius:3,pointBackgroundColor:color}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{ticks:{callback:v=>v>=1000?(v/1000).toFixed(0)+'k':v,font:{size:10},color:'#a09d96'},grid:{color:'rgba(0,0,0,.05)'}},x:{ticks:{font:{size:10},color:'#a09d96',autoSkip:false,maxRotation:0},grid:{display:false}}}}});
   charts['fat']=new Chart(document.getElementById('ch-fat').getContext('2d'),chartOpts('#e94560','bar'));
-  const kgOpts=chartOpts('#378add','line');
-  kgOpts.data.datasets[0].backgroundColor='rgba(55,138,221,.08)';
-  kgOpts.data.datasets[0].fill=true;
-  charts['kg']=new Chart(document.getElementById('ch-kg').getContext('2d'),kgOpts);
+  const selMesVal=document.getElementById('sel-mes')?.value;
+  let kgLabels, kgData;
+  if(selMesVal&&selMesVal!=='all'){
+    // Modo dia: agrupar por dia do mês selecionado
+    const mesIdx=parseInt(selMesVal);
+    const anoAtual=new Date().getFullYear();
+    const diasNoMes=new Date(anoAtual,mesIdx+1,0).getDate();
+    const bd=Array(diasNoMes).fill(0);
+    ps.forEach(p=>{
+      if(!p.data) return;
+      const parts=p.data.split('-');
+      if(parseInt(parts[1])-1!==mesIdx) return;
+      const dia=parseInt(parts[2])-1;
+      if(dia>=0&&dia<diasNoMes) bd[dia]+=parseFloat(p.kg)||0;
+    });
+    kgLabels=Array.from({length:diasNoMes},(_,i)=>String(i+1));
+    kgData=bd.map(v=>parseFloat((v/1000).toFixed(3)));
+    const tit=document.getElementById('kg-chart-title');
+    if(tit)tit.textContent='kg por dia · '+['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][mesIdx];
+  } else {
+    // Modo mês: igual ao anterior
+    kgLabels=mcd.map(v=>MESES[v.i]);
+    kgData=mcd.map(v=>parseFloat((v.k/1000).toFixed(3)));
+    const tit=document.getElementById('kg-chart-title');
+    if(tit)tit.textContent='Toneladas por mês';
+  }
+  dch('kg');
+  charts['kg']=new Chart(document.getElementById('ch-kg').getContext('2d'),{
+    type:'bar',
+    data:{labels:kgLabels,datasets:[{label:'',data:kgData,backgroundColor:'#378add',borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>`${ctx.parsed.y.toFixed(3)}t · ${Math.round(ctx.parsed.y*1000).toLocaleString('pt-BR')}kg`}}},
+      scales:{
+        y:{ticks:{callback:v=>v>=1?v.toFixed(1)+'t':v.toFixed(2)+'t',font:{size:10},color:'#8fa3c0'},grid:{color:'rgba(255,255,255,.04)'}},
+        x:{ticks:{font:{size:9},color:'#8fa3c0',autoSkip:selMesVal&&selMesVal!=='all'?true:false,maxRotation:0},grid:{display:false}}
+      }
+    }
+  });
   const cm={};ps.forEach(p=>{if(!p.cliente)return;cm[p.cliente]=(cm[p.cliente]||0)+(parseFloat(p.total)||0)});
   const tc=Object.entries(cm).sort((a,b)=>b[1]-a[1]).slice(0,6);const mx=tc[0]?.[1]||1;
   document.getElementById('top-cli').innerHTML=tc.length?`<div class="tcli">${tc.map(([n,v])=>`<div class="tcr"><span style="min-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx2)">${n}</span><div class="tbb"><div class="tbf" style="width:${Math.round(v/mx*100)}%"></div></div><span class="tcv">${fR(v)}</span></div>`).join('')}</div>`:'<div class="empty"><i class="ti ti-users"></i>Sem dados</div>';
@@ -808,7 +859,7 @@ function renderPedidos(resetPage){
     return `<tr>
       <td style="font-family:'DM Mono',monospace;font-size:10px;color:var(--tx3)">#${p.id}</td>
       <td><span class="${src==='sheets'?'src-s':'src-l'}">${src==='sheets'?'Sheets':'Local'}</span></td>
-      <td style="font-weight:600">${p.cliente||'—'}</td>
+      <td style="font-weight:600"><span style="cursor:pointer" onclick="openCliHist('${p.cliente}')" title="Ver histórico do cliente">${p.cliente||'—'}</span></td>
       <td style="color:var(--tx2);font-size:12px">${fD(p.data)}</td>
       <td><select class="inline-select" onchange="onStatusChange(this,'${p.id}')" style="background:${stColor};color:${stTextColor};font-weight:600;border-color:transparent">${statusOpts}</select></td>
       <td style="font-size:12px;font-family:'DM Mono',monospace">${fKg(p.kg)}</td>
@@ -844,10 +895,19 @@ function addRow(it){
   const co=DB.cores.map(c=>`<option value="${c.nome}">${c.nome}</option>`).join('');
   const fo=DB.fornecedores.map(f=>`<option value="${f.nome}">${f.nome}</option>`).join('');
   const tr=document.createElement('tr');tr.dataset.rid=id;
-  tr.innerHTML=`<td><select class="ia" onchange="onArt(this,${id})">${ao}</select></td><td><select class="ic">${co}</select></td><td><select class="if">${fo}</select></td><td><input type="number" class="ik" step="0.01" min="0" placeholder="0.0" oninput="calcR(${id});calcTtl()"></td><td><input type="number" class="ip" step="0.01" min="0" placeholder="0.00" oninput="calcR(${id});calcTtl()"></td><td><span class="is" style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace">—</span></td><td><button class="btn ghost sm" onclick="this.closest('tr').remove();calcTtl()" title="Remover"><i class="ti ti-trash" style="color:var(--acc)"></i></button></td>`;
+  tr.innerHTML=`<td><select class="ia" onchange="onArt(this,${id})">${ao}</select></td><td><select class="ic">${co}</select></td><td><select class="if">${fo}</select></td><td><input type="number" class="ik" step="0.01" min="0" placeholder="0.00" oninput="calcR(${id});calcTtl()" onkeydown="if(event.key==='Enter'){event.preventDefault();const rows=[...document.querySelectorAll('#itb tr')];const idx=rows.findIndex(r=>r.dataset.rid=='${id}');const next=rows[idx+1];if(next)next.querySelector('.ik').focus();else{addRow(getFirstRowData()?{...getFirstRowData(),kg:''}:null);calcTtl();setTimeout(()=>document.querySelectorAll('#itb tr .ik').forEach((el,i,a)=>{if(i===a.length-1)el.focus()}),50)}}"></td><td><input type="number" class="ip" step="0.01" min="0" placeholder="0.00" oninput="calcR(${id});calcTtl()" onkeydown="if(event.key==='Enter'){event.preventDefault();const rows=[...document.querySelectorAll('#itb tr')];const idx=rows.findIndex(r=>r.dataset.rid=='${id}');const next=rows[idx+1];if(next)next.querySelector('.ik').focus();else{addRow(getFirstRowData()?{...getFirstRowData(),kg:''}:null);calcTtl();setTimeout(()=>document.querySelectorAll('#itb tr .ik').forEach((el,i,a)=>{if(i===a.length-1)el.focus()}),50)}}"></td><td><span class="is" style="font-size:11px;color:var(--tx3);font-family:'DM Mono',monospace">—</span></td><td><button class="btn ghost sm" onclick="this.closest('tr').remove();calcTtl()" title="Remover"><i class="ti ti-trash" style="color:var(--acc)"></i></button></td>`;
   document.getElementById('itb').appendChild(tr);
-  if(it){tr.querySelector('.ia').value=it.artigo||'';tr.querySelector('.ic').value=it.cor||'';tr.querySelector('.if').value=it.fornecedor||'';tr.querySelector('.ik').value=it.kg||'';tr.querySelector('.ip').value=it.preco||'';calcR(id)}
-  else{const a=DB.artigos[0];if(a)tr.querySelector('.ip').value=a.precoVenda||a.preco||''}
+  if(it){
+    tr.querySelector('.ia').value=it.artigo||'';
+    tr.querySelector('.ic').value=it.cor||'';
+    tr.querySelector('.if').value=it.fornecedor||'';
+    if(it.kg)tr.querySelector('.ik').value=parseFloat(it.kg).toFixed(2);
+    tr.querySelector('.ip').value=it.preco||'';
+    calcR(id);
+  } else {
+    const a=DB.artigos[0];
+    if(a)tr.querySelector('.ip').value=a.precoVenda||a.preco||'';
+  }
 }
 function onArt(sel,id){
   const opt=sel.options[sel.selectedIndex];
@@ -867,11 +927,26 @@ function calcTtl(){
   document.querySelectorAll('#itb tr').forEach(tr=>{t+=(parseFloat(tr.querySelector('.ik')?.value)||0)*(parseFloat(tr.querySelector('.ip')?.value)||0)});
   document.getElementById('ttl').textContent=fR(t);
 }
-function addMultiRows(){for(let i=0;i<20;i++)addRow();calcTtl()}
+function getFirstRowData(){
+  const first=document.querySelector('#itb tr');
+  if(!first)return null;
+  return {
+    artigo:first.querySelector('.ia')?.value||'',
+    cor:first.querySelector('.ic')?.value||'',
+    fornecedor:first.querySelector('.if')?.value||'',
+    preco:first.querySelector('.ip')?.value||''
+  };
+}
+function addMultiRows(){
+  const ref=getFirstRowData();
+  for(let i=0;i<20;i++)addRow(ref?{...ref,kg:''}:null);
+  calcTtl();
+}
 function addCustomRows(){
   const n=parseInt(prompt('Quantos itens deseja adicionar?','10'));
   if(!n||n<1||n>200)return;
-  for(let i=0;i<n;i++)addRow();
+  const ref=getFirstRowData();
+  for(let i=0;i<n;i++)addRow(ref?{...ref,kg:''}:null);
   calcTtl();
 }
 function clearForm(){initForm();buildCliDl()}
@@ -1268,6 +1343,106 @@ function doLogin(){
 }
 
 checkLogin();
+
+
+// ─── HISTÓRICO DO CLIENTE ────────────────────────────────────────────────────
+function openCliHist(cliente){
+  if(!cliente)return;
+  document.getElementById('cli-nome').textContent=cliente;
+  const peds=[...DB.pedidos].filter(p=>p.cliente===cliente)
+    .sort((a,b)=>parseInt(String(b.id).replace(/\D/g,''))||0 - parseInt(String(a.id).replace(/\D/g,''))||0);
+  const total=peds.reduce((s,p)=>s+(parseFloat(p.total)||0),0);
+  const pago=peds.reduce((s,p)=>s+(parseFloat(p.pago)||0),0);
+  const pendentes=peds.filter(p=>p.status==='Pendente');
+  const aRec=pendentes.reduce((s,p)=>s+Math.max(0,(parseFloat(p.total)||0)-(parseFloat(p.pago)||0)),0);
+  const ultimoPed=peds[0];
+  const body=document.getElementById('cli-body');
+  body.innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+      <div class="mc"><div class="ml">Total comprado</div><div class="mv" style="font-size:16px">${fR(total)}</div></div>
+      <div class="mc"><div class="ml">Total pago</div><div class="mv" style="font-size:16px">${fR(pago)}</div></div>
+      <div class="mc ${aRec>0?'accent':''}"><div class="ml">A receber</div><div class="mv" style="font-size:16px">${fR(aRec)}</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:600;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px">${peds.length} pedidos · Último: ${ultimoPed?fD(ultimoPed.data):'—'}</div>
+      ${pendentes.length>0?`<span style="background:var(--amber-bg);color:var(--amber);padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">${pendentes.length} pendente${pendentes.length>1?'s':''}</span>`:''}
+    </div>
+    <div style="max-height:320px;overflow-y:auto">
+      <table class="tbl" style="font-size:12px">
+        <thead><tr><th>#</th><th>Data</th><th>Status</th><th style="text-align:right">Total</th><th style="text-align:right">Pago</th><th style="text-align:right">Saldo</th></tr></thead>
+        <tbody>${peds.map(p=>{
+          const saldo=(parseFloat(p.total)||0)-(parseFloat(p.pago)||0);
+          return `<tr>
+            <td style="font-size:11px;color:var(--tx3)">#${p.id}</td>
+            <td>${fD(p.data)}</td>
+            <td><span class="pill ${p.status==='Concluído'?'pill-ok':'pill-warn'}">${p.status}</span></td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">${fR(p.total)}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace">${fR(p.pago||0)}</td>
+            <td style="text-align:right;font-family:'DM Mono',monospace;color:${saldo>0.01?'var(--red)':'var(--green)'}">${fR(saldo)}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    </div>`;
+  document.getElementById('m-cli').classList.add('open');
+}
+
+
+
+// ─── RECORDE E RITMO ─────────────────────────────────────────────────────────
+function renderRecorde(pedidos){
+  const todos=DB.pedidos;
+  if(!todos.length) return '';
+  const unicos=Object.values(todos.reduce((acc,p)=>{acc[p.id]=p;return acc},{}));
+  const porMesAno={};
+  unicos.forEach(p=>{
+    if(!p.data||!p.kg) return;
+    const d=String(p.data);
+    if(!d.includes('-')) return;
+    const parts=d.split('-');
+    const ano=parts[0];
+    const mes=parts[1];
+    const k=ano+'-'+mes;
+    porMesAno[k]=(porMesAno[k]||0)+(parseFloat(p.kg)||0);
+  });
+  const entries=Object.entries(porMesAno).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+  if(!entries.length) return '';
+  const [melhorMes,melhorKg]=entries[0];
+  const [ano,mes]=melhorMes.split('-');
+  const nomes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const nomeMes=nomes[parseInt(mes)-1]+'/'+ano;
+  const tons=(melhorKg/1000).toFixed(3);
+  return `<div class="mc" style="border-color:var(--amber)">
+    <div class="ml" style="color:var(--amber)"><i class="ti ti-trophy" style="margin-right:4px"></i>Recorde histórico</div>
+    <div class="mv" style="font-size:22px">${tons}<span style="font-size:13px;color:var(--tx2);margin-left:3px">t</span></div>
+    <div style="font-size:11px;color:var(--tx3);margin-top:2px">${nomeMes} · ${Math.round(melhorKg).toLocaleString('pt-BR')} kg</div>
+  </div>`;
+}
+
+function renderRitmo(pedidos){
+  if(!pedidos.length) return '';
+  const hoje=new Date();
+  const mesAtual=hoje.getMonth()+1;
+  const anoAtual=hoje.getFullYear();
+  const diaMes=hoje.getDate();
+  const diasNoMes=new Date(anoAtual,mesAtual,0).getDate();
+  const kgMes=pedidos.filter(p=>{
+    if(!p.data) return false;
+    const d=new Date(p.data);
+    return d.getMonth()+1===mesAtual && d.getFullYear()===anoAtual;
+  }).reduce((s,p)=>s+(parseFloat(p.kg)||0),0);
+  if(!kgMes) return '';
+  const projecao=Math.round((kgMes/diaMes)*diasNoMes);
+  const tons=(kgMes/1000).toFixed(2);
+  const tonsProj=(projecao/1000).toFixed(2);
+  const pct=Math.round((diaMes/diasNoMes)*100);
+  return `<div class="mc" style="border-color:var(--blue)">
+    <div class="ml" style="color:var(--blue)"><i class="ti ti-trending-up" style="margin-right:4px"></i>Ritmo atual</div>
+    <div class="mv" style="font-size:22px">${tons}<span style="font-size:13px;color:var(--tx2);margin-left:3px">t</span></div>
+    <div style="font-size:11px;color:var(--tx3);margin-top:2px">Dia ${diaMes}/${diasNoMes} · projeção: <strong style="color:var(--blue)">${tonsProj}t</strong></div>
+    <div style="height:4px;background:var(--bg3);border-radius:4px;margin-top:6px"><div style="height:100%;width:${pct}%;background:var(--blue);border-radius:4px"></div></div>
+  </div>`;
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 loadConfig();
 DB.artigos=DB.artigos.map(a=>({...a,precoVenda:typeof a.precoVenda==='number'?a.precoVenda:0}));
